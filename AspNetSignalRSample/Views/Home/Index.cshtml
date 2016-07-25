@@ -1,0 +1,41 @@
+﻿<h2>Index</h2>
+
+<fieldset>
+    <legend>SignalR Demo</legend>
+    <label for="txtInput">Chat Message</label>
+    <input type="text" id="txtInput"/>
+    <button id="submitButton">Submit</button>
+</fieldset>
+
+<fieldset>
+    <legend>Messages</legend>
+    <ul id="messages"></ul>
+</fieldset>
+
+@section scripts {
+    <script type="text/javascript" src="~/Scripts/jquery.signalR-2.2.1.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var $txtInput = $("#txtInput");
+            var $submitButton = $("#submitButton");
+
+            var chat = $.connection.chatHub;
+
+            chat.client.writeMessage = function (msg) {
+                $("#messages").append("<li>" + msg + "</li>");
+            }
+
+            $submitButton.on("click", function () {
+                chat.server.broadcastMessage($txtInput.val());
+            });
+
+            $txtInput.on("keypress", function (event) {
+                var key = event.which || event.keyCode;
+                if (key ===  13) $submitButton.click();
+            });
+
+            $.connection.hub.start();
+        });
+    </script>
+}
